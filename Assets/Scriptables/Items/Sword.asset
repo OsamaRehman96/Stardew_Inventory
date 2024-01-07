@@ -15,6 +15,6 @@ MonoBehaviour:
   itemID: 0
   visualSprite: {fileID: 21300000, guid: 835bdb720dae0bc4bb1d2b7109e89dfc, type: 3}
   itemName: Sword
-  itemType: 3
+  itemType: 4
   isStackable: 0
   maxStackValue: 1

@@ -15,6 +15,6 @@ MonoBehaviour:
   itemID: 0
   visualSprite: {fileID: 21300000, guid: 1348d03a42e9d9045b314775af0a2950, type: 3}
   itemName: Shovel
-  itemType: 3
+  itemType: 4
   isStackable: 0
   maxStackValue: 1
