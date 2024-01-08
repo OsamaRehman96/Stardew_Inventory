@@ -104,7 +104,7 @@ public class DragDropSystem : MonoBehaviour
                     draggableItem = null;
                     currentSlot.inventoryItem.transform.localPosition = Vector3.zero;
 
-                    if (slot is ItemSlot)
+                    if (currentSlot is ItemSlot)
                     {
                         ItemSlot itemSlot = (ItemSlot)currentSlot;
 

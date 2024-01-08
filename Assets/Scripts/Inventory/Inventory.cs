@@ -134,6 +134,13 @@ public class Inventory : MonoBehaviour
                     continueToAdd = true;
                     break;
                 }
+                //Check if the item is not stackable then add it to an available slot
+                else if(!newInventoryItem.isStackable)
+                {
+                    //continue to add the item to slot
+                    continueToAdd = true;
+                    break;
+                }
 
             }
         }

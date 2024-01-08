@@ -15,6 +15,6 @@ MonoBehaviour:
   itemID: 0
   visualSprite: {fileID: 21300002, guid: e10c13642d970a64cbfb16f898fcd46c, type: 3}
   itemName: Coal
-  itemType: 1
+  itemType: 0
   isStackable: 1
-  maxStackValue: 1
+  maxStackValue: 2
