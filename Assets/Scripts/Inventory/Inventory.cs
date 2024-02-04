@@ -47,13 +47,14 @@ public class Inventory : MonoBehaviour
     //slot prefab to instantiate
     public GameObject itemSlotPrefab;
 
-  
+
 
 
     private void Awake()
     {
         //Init function in EventManager
-        EventManager.TryAddingToInventory = TryAddingItemToInventory;
+        //EventManager.TryAddingToInventory = TryAddingItemToInventory;
+        EventManager.TryAddingToInventory = TryAddingItem;
         itemDictionary = new Dictionary<ScriptableItem, ItemInventory>();
     }
 
@@ -66,31 +67,35 @@ public class Inventory : MonoBehaviour
 
     #region Inventory MAIN
 
+
+
+    //Revamped function
     /// <summary>
     /// This function adds items to inventory and also handles stacking of items
     /// </summary>
     /// <param name="itemToAdd">Item to be added</param>
-    private void TryAddingItemToInventory(Item itemToAdd)
+    private void TryAddingItem(Item itemToAdd)
     {
-        //Check if inventory is full
-        if (availbleItemSlots == items.Count)
-        {
-            if (itemToAdd.SO_Item.isStackable)
-            {
-
-            }
-            else
-            {
-                Debug.LogError("Inventory is Full");
-                return;
-            }
-        }
-
-
-        //Check if slots are greatr than 0
+        //check if slot count >0
         if (slots.Count <= 0)
             return;
 
+
+        #region Inventory Full Check
+        //checking if inventory is full
+        if (IsInventoryFull())
+        {
+            ///Check if the item to add is a stackable item, if it is continue;
+            ///If it is not a stackable item then return that the inventory is full
+            if (!itemToAdd.SO_Item.isStackable)
+            {
+                Debug.Log("Inventory is full");
+                return;
+            }
+        }
+        #endregion
+
+        #region Instantiate ItemToAdd
 
         //Instantiate a new item prefab
         ItemInventory newInventoryItem = Instantiate(inventoryItemPrefab, itemContainer);
@@ -99,128 +104,103 @@ public class Inventory : MonoBehaviour
         //Setup inventoryItem
         newInventoryItem.SetupInventoryItem();
 
+        #endregion
+
+        //Lets check if item already exists in the list and what is its stack count
+        #region Loop Checking
+
+        //cache the first available slot
+        ItemSlot firstEmptySlot = null;
+        //bool to check if the item has been stacked or not
+        bool itemStacked = false;
 
 
-        //Count to keep track of loops
-        int count = 0;
-        //A bool that checks if we should progress to the loop or end it
-        bool continueToAdd = true;
-
-        //The first for loop checks for stackable items first. If it finds an item in the list that can be stacked then it stops the loop and stacks the item
         foreach (ItemSlot slot in slots)
         {
-            //If items already exists, exit the loop
-            if (!SO_Items.Contains(newInventoryItem.SO_Item))
-                break;
 
-            //If there are some items in the inventory then proceed to check those items
-            if (items.Count > 0)
+
+            Debug.LogWarning("Slot Available: " + slot.slotAvailable);
+            Debug.LogWarning("Slot Empty: " + slot.slotEmpty);
+
+            //keep checking for the first available slot and store it
+            if (slot.slotAvailable && firstEmptySlot == null)
             {
-                continueToAdd = false;
-                Debug.Log("Theres an item in this list");
-
-                //I find the slot that has the same item by going through all the slot items and checking if its maxed or not
-                if (!slot.slotEmpty && newInventoryItem.isStackable && slot.inventoryItem.SO_Item == newInventoryItem.SO_Item && !slot.GetStackMaxed())
+                if (slot.slotEmpty)
                 {
-                    Debug.Log("Found item in " + slot.name + " and it has " + (slot.maxStack - slot.stackCount).ToString() + " space available");
-                    slot.StackItem();
-                    Destroy(newInventoryItem.gameObject);
-                    break;
-                }
-                else if (!slot.slotEmpty && newInventoryItem.isStackable && slot.inventoryItem.SO_Item == newInventoryItem.SO_Item && slot.GetStackMaxed())
-                {
-                    Debug.Log("Found item in " + slot.name + " and is maxed");
-                    //If slot is full continue to add the item in a new slot
-                    continueToAdd = true;
-                    break;
-                }
-                //Check if the item is not stackable then add it to an available slot
-                else if(!newInventoryItem.isStackable)
-                {
-                    //continue to add the item to slot
-                    continueToAdd = true;
-                    break;
+                    firstEmptySlot = slot;
                 }
 
+                if (items.Count == 0)
+                {
+                    break;
+                }
             }
-        }
-
-        //This loop adds the item to the available slot
-        foreach (ItemSlot slot in slots)
-        {
-            if (slot.slotAvailable)
-                count++;
-
-            if (slot.slotAvailable)
-                Debug.Log("----------------Loop Count " + count);
 
 
-
-
-            #region Item Addition without Stacking
-
-            if (continueToAdd)
+            if (!slot.slotEmpty && slot.slotAvailable)
             {
-             
-                Debug.LogWarning("Slot Available: " + slot.slotAvailable);
-                Debug.LogWarning("Slot Empty: " + slot.slotAvailable);
-                if (slot.slotAvailable && !slot.slotEmpty && newInventoryItem.isStackable)
+                Debug.Log(slot.name);
+                if (slot.inventoryItem.SO_Item == newInventoryItem.SO_Item && newInventoryItem.isStackable)
                 {
-                    //Here I check if the Item I am adding to inventory matches the item in the slot
-                    if (slot.inventoryItem.SO_Item == newInventoryItem.SO_Item)
+                    if (!slot.GetStackMaxed())
                     {
-                        //If it does, I check if the slot has a capcity to add that item in itself
-                        if (!slot.GetStackMaxed())
-                        {
-                            //We stack the item in the slot
-                            slot.StackItem();
-                            Destroy(newInventoryItem.gameObject);
-                            break;
-                        }
-                        else
-                        {
-
-                            //Else we continue with the loop
-                            Debug.LogError("Stacked to the full");
-                            continue;
-                        }
-                       
+                        slot.StackItem();
+                        Destroy(newInventoryItem.gameObject);
+                        itemStacked = true;
+                        break;
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
-                else if (slot.slotAvailable && slot.slotEmpty)
-                {
-                    slot.InitItemInSlot(newInventoryItem);
-                    // Add the new item to the inventory list
-                    items.Add(newInventoryItem);
-                    //Add Scriptable Items to list
-                    SO_Items.Add(newInventoryItem.SO_Item);
-                    break;
-                }
-                else if (slot.slotAvailable && !slot.slotEmpty && !newInventoryItem.isStackable)
-                {
-                    Debug.LogWarning("Look for new slots");
-                    continue;
-                }
-                else
-                {
-                    Debug.Log("Destroying Item");
-                    Destroy(newInventoryItem.gameObject);
 
-                    return;
-                }
             }
-            #endregion
 
 
         }
+
+        if (!itemStacked)
+        {
+            if (IsInventoryFull())
+            {
+                Debug.Log("Item inventory us full destroying gameobject");
+                Destroy(newInventoryItem.gameObject);
+                return;
+            }
+            else
+            {
+                Debug.Log("adding to empty slot");
+
+                firstEmptySlot.InitItemInSlot(newInventoryItem);
+                items.Add(newInventoryItem);
+                SO_Items.Add(newInventoryItem.SO_Item);
+            }
+        }
+
 
         Destroy(itemToAdd.gameObject);
 
+        #endregion
     }
-    #endregion
 
 
-  
+    /// <summary>
+    /// Function to check if inventory is full
+    /// </summary>
+    /// <returns>returns true if inventory is full</returns>
+    private bool IsInventoryFull()
+    {
+        if (availbleItemSlots == items.Count)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+
+
     /// <summary>
     /// This function is called when trying to drag and drop items in the slots
     /// </summary>
@@ -246,6 +226,8 @@ public class Inventory : MonoBehaviour
             Debug.Log("Slot Not Empty");
         }
     }
+
+    #endregion
 
     #region UI
     public void OpenInventory()
@@ -308,12 +290,13 @@ public class Inventory : MonoBehaviour
     }
 
 
-   
 
- 
+
+
     //Get Rect Transform of Item Container (Parent Gameobject)
     public RectTransform GetItemContainer()
     {
         return itemContainer.GetComponent<RectTransform>();
     }
 }
+
