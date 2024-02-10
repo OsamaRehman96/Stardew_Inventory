@@ -118,9 +118,10 @@ public class Inventory : MonoBehaviour
         foreach (ItemSlot slot in slots)
         {
 
-
+#if UNITY_EDITOR
             Debug.LogWarning("Slot Available: " + slot.slotAvailable);
             Debug.LogWarning("Slot Empty: " + slot.slotEmpty);
+#endif
 
             //keep checking for the first available slot and store it
             if (slot.slotAvailable && firstEmptySlot == null)

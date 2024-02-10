@@ -13,6 +13,8 @@ public class InventoryItemDragDrop : MonoBehaviour, IPointerDownHandler, IBeginD
     private ItemInventory item;
     private ItemSlot currentSlot;
 
+    private DropItemArea dropArea;
+
     private void Awake()
     {
         canvas = GetComponentInParent<Canvas>();
@@ -42,9 +44,11 @@ public class InventoryItemDragDrop : MonoBehaviour, IPointerDownHandler, IBeginD
     {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
+        
+
 
         DragDropSystem.instance.StoppedDragging();
-        //throw new System.NotImplementedException();k
+       
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -63,4 +67,8 @@ public class InventoryItemDragDrop : MonoBehaviour, IPointerDownHandler, IBeginD
     {
         ItemDisplay.HideDisplay();
     }
+
+
+
+
 }

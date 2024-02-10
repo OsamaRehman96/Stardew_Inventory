@@ -56,26 +56,6 @@ public class OreResource : MineableResource
 
     private void SpawnAndSpringPrefab()
     {
-        // // Instantiate the prefab at the specified spawn point
-        // GameObject newPrefab = Instantiate(itemToInstantiate, transform.localPosition, Quaternion.identity);
-        // PickableItem pickableItem = newPrefab.GetComponent<PickableItem>();
-
-        // pickableItem.SetupItem();
-        // // Make sure the instantiated object is a child of the spawn point
-        //// newPrefab.transform.parent = spawnPoint;
-
-        // // Apply the spring animation using DoTween
-        // newPrefab.transform.localScale = Vector3.zero; // Start with scale 0 to make it appear from nothing
-        // newPrefab.transform.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBounce); // Spring animation from scale 0 to 1
-
-        // // Apply the spring position animation
-        // Vector3 originalPosition = newPrefab.transform.position;
-        // Vector3 targetPosition = originalPosition + Vector3.up * 0.5f; // Adjust the spring height
-        // newPrefab.transform.DOMove(targetPosition, 0.3f).SetEase(Ease.OutBounce).OnComplete(() =>
-        // {
-        //     // Animation complete, do something if needed
-        //    // Debug.Log("Spring animation complete!");
-        // });
 
         // Define the radius of the circle and the minimum distance from the center
         float circleRadius = 1f; // Change this value to your desired radius

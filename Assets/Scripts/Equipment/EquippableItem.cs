@@ -15,7 +15,7 @@ public class EquippableItem : Item,I_Interactable
         SetupItem();
     }
 
-    private void SetupItem()
+    public void SetupItem()
     {
         SetupSprite();
         BoxCollider2D collider = gameObject.AddComponent<BoxCollider2D>();
